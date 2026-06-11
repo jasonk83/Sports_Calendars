@@ -1,7 +1,7 @@
 import requests
 from ics import Calendar, Event
 from datetime import datetime, timedelta
-from zoneinfo import ZoneInfo # <-- New import for timezone handling
+from zoneinfo import ZoneInfo
 
 def fetch_and_build_calendar():
     # Placeholder for your chosen API endpoint
@@ -21,19 +21,15 @@ def fetch_and_build_calendar():
         team1 = match.get("team1", "TBD")
         team2 = match.get("team2", "TBD")
         
-        event.name = f"World Cup 2026: {team1} vs {team2}"
+        # --- UPDATED LINE ---
+        event.name = f"⚽ {team1} vs {team2}"
         
         date_str = match.get("date")
         time_str = match.get("time") 
         
         try:
-            # 1. Parse the raw time from the API
             naive_time = datetime.strptime(f"{date_str} {time_str[:5]}", "%Y-%m-%d %H:%M")
-            
-            # 2. Assign UTC timezone (assuming the API provides UTC times)
             utc_time = naive_time.replace(tzinfo=ZoneInfo("UTC"))
-            
-            # 3. Convert directly to Eastern Time
             eastern_time = utc_time.astimezone(ZoneInfo("America/New_York"))
             
             event.begin = eastern_time
@@ -47,7 +43,8 @@ def fetch_and_build_calendar():
         event.description = f"Group: {match.get('group', 'TBD')} | Round: {match.get('round', 'TBD')}"
         cal.events.add(event)
 
-    with open('world_cup_2026.ics', 'w') as my_file:
+        # --- UPDATED LINE (added encoding='utf-8' to handle the emoji safely) ---
+    with open('world_cup_2026.ics', 'w', encoding='utf-8') as my_file:
         my_file.writelines(cal.serialize_iter())
     print("Successfully updated world_cup_2026.ics")
 
