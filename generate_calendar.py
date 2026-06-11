@@ -16,6 +16,32 @@ def fetch_and_build_calendar():
     matches = data.get("matches", [])
     cal = Calendar()
 
+    # Dictionary to dynamically map host cities to their exact timezones
+    timezone_map = {
+        "vancouver": "America/Vancouver",
+        "seattle": "America/Los_Angeles",
+        "san francisco": "America/Los_Angeles",
+        "santa clara": "America/Los_Angeles",
+        "los angeles": "America/Los_Angeles",
+        "inglewood": "America/Los_Angeles",
+        "guadalajara": "America/Mexico_City",
+        "mexico city": "America/Mexico_City",
+        "monterrey": "America/Monterrey",
+        "dallas": "America/Chicago",
+        "arlington": "America/Chicago",
+        "houston": "America/Chicago",
+        "kansas city": "America/Chicago",
+        "atlanta": "America/New_York",
+        "miami": "America/New_York",
+        "boston": "America/New_York",
+        "foxborough": "America/New_York",
+        "new york": "America/New_York",
+        "new jersey": "America/New_York",
+        "east rutherford": "America/New_York",
+        "philadelphia": "America/New_York",
+        "toronto": "America/Toronto"
+    }
+
     for match in matches:
         event = Event()
         team1 = match.get("team1", "TBD")
@@ -25,22 +51,33 @@ def fetch_and_build_calendar():
         
         date_str = match.get("date")
         time_str = match.get("time") 
+        stadium = match.get("ground", "").lower()
+        
+        # Default to Eastern Time if a stadium isn't found
+        match_tz = "America/New_York" 
+        for key, tz in timezone_map.items():
+            if key in stadium:
+                match_tz = tz
+                break
         
         try:
-            # 1. Parse the raw time from the API
+            # 1. Parse the local stadium time
             naive_time = datetime.strptime(f"{date_str} {time_str[:5]}", "%Y-%m-%d %H:%M")
             
-            # 2. Tell Python this time is ALREADY Eastern Time
-            eastern_time = naive_time.replace(tzinfo=ZoneInfo("America/New_York"))
+            # 2. Assign the specific timezone based on where the stadium is located
+            stadium_time = naive_time.replace(tzinfo=ZoneInfo(match_tz))
             
-            event.begin = eastern_time
-            # Standard match length + buffer
-            event.end = eastern_time + timedelta(hours=2) 
+            # 3. Convert universally to UTC so Google Calendar translates it flawlessly
+            utc_time = stadium_time.astimezone(ZoneInfo("UTC"))
+            
+            event.begin = utc_time
+            event.end = utc_time + timedelta(hours=2) 
         except Exception as e:
             print(f"Skipping match due to time parsing error: {e}")
             continue
 
-        event.location = match.get("ground", "TBD Stadium")
+        # Using title() to capitalize the stadium name cleanly
+        event.location = match.get("ground", "TBD Stadium").title()
         event.description = f"Group: {match.get('group', 'TBD')} | Round: {match.get('round', 'TBD')}"
         cal.events.add(event)
 
