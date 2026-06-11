@@ -1,10 +1,10 @@
 import requests
 from ics import Calendar, Event
 from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo # <-- New import for timezone handling
 
 def fetch_and_build_calendar():
     # Placeholder for your chosen API endpoint
-    # Example: A free community-maintained JSON or a paid sports API
     API_URL = "https://raw.githubusercontent.com/openfootball/worldcup.json/master/2026/worldcup.json"
     
     response = requests.get(API_URL)
@@ -23,16 +23,22 @@ def fetch_and_build_calendar():
         
         event.name = f"World Cup 2026: {team1} vs {team2}"
         
-        # You will need to adjust the time parsing based on your API's specific format
-        date_str = match.get("date") # e.g., "2026-06-11"
-        time_str = match.get("time") # e.g., "15:00"
+        date_str = match.get("date")
+        time_str = match.get("time") 
         
         try:
-            # Assuming the API provides UTC time
-            start_time = datetime.strptime(f"{date_str} {time_str[:5]}", "%Y-%m-%d %H:%M")
-            event.begin = start_time
+            # 1. Parse the raw time from the API
+            naive_time = datetime.strptime(f"{date_str} {time_str[:5]}", "%Y-%m-%d %H:%M")
+            
+            # 2. Assign UTC timezone (assuming the API provides UTC times)
+            utc_time = naive_time.replace(tzinfo=ZoneInfo("UTC"))
+            
+            # 3. Convert directly to Eastern Time
+            eastern_time = utc_time.astimezone(ZoneInfo("America/New_York"))
+            
+            event.begin = eastern_time
             # Standard match length + buffer
-            event.end = start_time + timedelta(hours=2) 
+            event.end = eastern_time + timedelta(hours=2) 
         except Exception as e:
             print(f"Skipping match due to time parsing error: {e}")
             continue
@@ -41,7 +47,6 @@ def fetch_and_build_calendar():
         event.description = f"Group: {match.get('group', 'TBD')} | Round: {match.get('round', 'TBD')}"
         cal.events.add(event)
 
-    # Export the calendar file
     with open('world_cup_2026.ics', 'w') as my_file:
         my_file.writelines(cal.serialize_iter())
     print("Successfully updated world_cup_2026.ics")
