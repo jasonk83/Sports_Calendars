@@ -44,4 +44,4 @@ def fetch_espn_schedule(sport, league, team_abbr, emoji, output_file):
 
 if __name__ == "__main__":
     # Fetch Tottenham Hotspur
-    fetch_espn_schedule("soccer", "eng.1", "tot", "⚽", "spurs_schedule.ics")
+    fetch_espn_schedule("soccer", "eng.1", "367", "⚽", "spurs_schedule.ics")
