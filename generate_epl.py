@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 def fetch_espn_schedule(sport, league, team_abbr, emoji, output_file):
-    url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_abbr}/schedule"
+    url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_abbr}/schedule?limit=200"
     response = requests.get(url)
     if response.status_code != 200:
         print(f"Error: Failed to fetch {team_abbr} data.")
