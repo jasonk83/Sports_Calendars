@@ -1,3 +1,4 @@
+/deprecated
 import requests
 from ics import Calendar, Event
 from datetime import datetime, timedelta
