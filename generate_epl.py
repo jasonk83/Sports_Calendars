@@ -53,4 +53,8 @@ def fetch_espn_schedule(sport, league, team_id, emoji, output_file):
     print(f"Successfully updated {output_file}")
 
 if __name__ == "__main__":
+    # Fetch Tottenham Hotspur (Team ID: 367) across all competitions
     fetch_espn_schedule("soccer", "all", "367", "⚽", "spurs_schedule.ics")
+    
+    # Fetch Burnley FC (Team ID: 379) across all competitions
+    fetch_espn_schedule("soccer", "all", "379", "⚽", "burnley_schedule.ics")
