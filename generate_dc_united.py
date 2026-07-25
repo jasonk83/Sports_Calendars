@@ -45,4 +45,4 @@ def fetch_espn_schedule(sport, league, team_id, emoji, output_file):
 
 if __name__ == "__main__":
     # Fetch DC United (MLS Team ID: 193)
-    fetch_espn_schedule("soccer", "usa.1", "193", "🦅", "dc_united_schedule.ics")
+    fetch_espn_schedule("soccer", "usa.1", "193", "⚽", "dc_united_schedule.ics")
