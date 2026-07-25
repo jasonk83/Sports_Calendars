@@ -4,45 +4,53 @@ from datetime import datetime, timedelta
 from zoneinfo import ZoneInfo
 
 def fetch_espn_schedule(sport, league, team_id, emoji, output_file):
-    url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule?limit=200"
-    response = requests.get(url)
-    if response.status_code != 200:
-        print(f"Error: Failed to fetch data for team ID: {team_id}.")
-        return
-
-    data = response.json()
+    base_url = f"https://site.api.espn.com/apis/site/v2/sports/{sport}/{league}/teams/{team_id}/schedule"
+    
+    # ESPN separates past games and future games. We need to scrape both!
+    urls = [
+        base_url,                  # Gets all completed games
+        f"{base_url}?fixture=true" # Gets all future upcoming games
+    ]
+    
     cal = Calendar()
     
-    for item in data.get("events", []):
-        event = Event()
-        name = item.get("name", "Unknown Matchup")
-        event.name = f"{emoji} {name}"
-        
-        time_str = item.get("date") 
-        if not time_str:
+    # Loop through both URLs and combine the results
+    for url in urls:
+        response = requests.get(url)
+        if response.status_code != 200:
+            print(f"Warning: Failed to fetch data from {url}")
             continue
+
+        data = response.json()
+        
+        for item in data.get("events", []):
+            event = Event()
+            name = item.get("name", "Unknown Matchup")
+            event.name = f"{emoji} {name}"
             
-        try:
-            # Clean the 'Z' and parse using the robust fromisoformat method
-            clean_time = time_str.replace('Z', '')
-            utc_time = datetime.fromisoformat(clean_time).replace(tzinfo=ZoneInfo("UTC"))
-            eastern_time = utc_time.astimezone(ZoneInfo("America/New_York"))
-            
-            event.begin = eastern_time
-            event.end = eastern_time + timedelta(hours=2) # Soccer is usually a clean 2 hours
-            
-            competitions = item.get("competitions", [])
-            if competitions and "venue" in competitions[0]:
-                event.location = competitions[0]["venue"].get("fullName", "TBD Pitch")
+            time_str = item.get("date") 
+            if not time_str:
+                continue
                 
-            cal.events.add(event)
-        except Exception as e:
-            print(f"Skipping match due to error: {e}")
+            try:
+                clean_time = time_str.replace('Z', '')
+                utc_time = datetime.fromisoformat(clean_time).replace(tzinfo=ZoneInfo("UTC"))
+                eastern_time = utc_time.astimezone(ZoneInfo("America/New_York"))
+                
+                event.begin = eastern_time
+                event.end = eastern_time + timedelta(hours=2)
+                
+                competitions = item.get("competitions", [])
+                if competitions and "venue" in competitions[0]:
+                    event.location = competitions[0]["venue"].get("fullName", "TBD Pitch")
+                    
+                cal.events.add(event)
+            except Exception as e:
+                print(f"Skipping match due to error: {e}")
 
     with open(output_file, 'w', encoding='utf-8') as f:
         f.writelines(cal.serialize_iter())
     print(f"Successfully updated {output_file}")
 
 if __name__ == "__main__":
-    # Fetch DC United (MLS Team ID: 193)
-    fetch_espn_schedule("soccer", "all", "193", "⚽", "dc_united_schedule.ics")
+    fetch_espn_schedule("soccer", "all", "193", "🛡️", "dc_united_schedule.ics")
