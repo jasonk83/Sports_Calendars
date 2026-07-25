@@ -53,4 +53,4 @@ def fetch_espn_schedule(sport, league, team_id, emoji, output_file):
     print(f"Successfully updated {output_file}")
 
 if __name__ == "__main__":
-    fetch_espn_schedule("soccer", "all", "193", "🛡️", "dc_united_schedule.ics")
+    fetch_espn_schedule("soccer", "all", "193", "⚽", "dc_united_schedule.ics")
