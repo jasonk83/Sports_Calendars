@@ -24,7 +24,8 @@ def fetch_espn_schedule(sport, league, team_abbr, emoji, output_file):
             
         try:
             clean_time = time_str.replace('Z', '')
-            utc_time = datetime.strptime(clean_time, "%Y-%m-%dT%H:%M").replace(tzinfo=ZoneInfo("UTC"))
+            # fromisoformat handles both with and without seconds seamlessly!
+            utc_time = datetime.fromisoformat(clean_time).replace(tzinfo=ZoneInfo("UTC"))
             eastern_time = utc_time.astimezone(ZoneInfo("America/New_York"))
             
             event.begin = eastern_time
