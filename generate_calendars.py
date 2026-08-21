@@ -173,8 +173,24 @@ def generate_ics_calendar(config):
             event.end = eastern_time + timedelta(hours=config["duration_hours"])
 
             competitions = item.get("competitions", [{}])
+            
+            # Extract Location
             if competitions and "venue" in competitions[0]:
                 event.location = competitions[0]["venue"].get("fullName", "TBD Arena")
+
+            # Extract Broadcast Info
+            tv_networks = []
+            if competitions:
+                broadcasts = competitions[0].get("broadcasts", [])
+                for broadcast in broadcasts:
+                    names = broadcast.get("names", [])
+                    tv_networks.extend(names)
+            
+            # Add Broadcast Info to Event Details/Description
+            if tv_networks:
+                event.description = f"TV/Streaming: {', '.join(tv_networks)}"
+            else:
+                event.description = "TV/Streaming: TBD"
 
             cal.events.add(event)
         except Exception as e:
