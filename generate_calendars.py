@@ -183,15 +183,42 @@ def generate_ics_calendar(config):
             if competitions:
                 broadcasts = competitions[0].get("broadcasts", [])
                 for broadcast in broadcasts:
+                    # Target the schedule endpoint format
+                    media = broadcast.get("media", {})
+                    if "shortName" in media:
+                        tv_networks.append(media["shortName"])
+                    
+                    # Fallback for the scoreboard endpoint format
                     names = broadcast.get("names", [])
-                    tv_networks.extend(names)
+                    if isinstance(names, list):
+                        tv_networks.extend(names)
             
-            # Add Broadcast Info to Event Details/Description
+            # Deduplicate networks and format the string
+            tv_networks = list(set(tv_networks))
             if tv_networks:
-                event.description = f"TV/Streaming: {', '.join(tv_networks)}"
+                desc_text = f"TV/Streaming: {', '.join(tv_networks)}"
             else:
-                event.description = "TV/Streaming: TBD"
+                desc_text = "TV/Streaming: TBD"
 
+            # Add F1 Podium for Completed Races
+            status = item.get("status", {}).get("type", {})
+            is_completed = status.get("completed", False)
+
+            if config.get("sport") == "racing" and is_completed and competitions:
+                competitors = competitions[0].get("competitors", [])
+                
+                # Filter for top 3 and sort by order
+                podium = [c for c in competitors if c.get("order", 999) <= 3]
+                podium.sort(key=lambda x: x.get("order", 999))
+                
+                if podium:
+                    desc_text += "\n\nPodium:"
+                    for comp in podium:
+                        place = comp.get("order")
+                        driver = comp.get("athlete", {}).get("displayName", "Unknown")
+                        desc_text += f"\n{place}. {driver}"
+
+            event.description = desc_text
             cal.events.add(event)
         except Exception as e:
             print(f"Skipping event due to parsing error: {e}")
