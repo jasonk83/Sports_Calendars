@@ -2,12 +2,20 @@ BEGIN:VCALENDAR
 VERSION:2.0
 PRODID:ics.py - http://git.io/lLljaA
 BEGIN:VEVENT
-DESCRIPTION:TV/Streaming: NBC 10\, NFL Net\, WBZ
+DESCRIPTION:TV/Streaming: WBZ\, NFL Net\, NBC 10
 DTEND:20260823T021500Z
 LOCATION:Gillette Stadium
 DTSTART:20260822T230000Z
 SUMMARY:🏈 Philadelphia Eagles at New England Patriots
-UID:a5c2a7b2-7ead-4389-ab2e-e7f42f1fed27@a5c2.org
+UID:eecf7d81-e072-4d70-9a65-a73b4e723288@eecf.org
+END:VEVENT
+BEGIN:VEVENT
+DESCRIPTION:TV/Streaming: FOX59\, Patriots Preseason Network
+DTEND:20260814T024500Z
+LOCATION:Gillette Stadium
+DTSTART:20260813T233000Z
+SUMMARY:🏈 Indianapolis Colts at New England Patriots
+UID:0fe22a76-a25f-4377-b8bd-9f400829f619@0fe2.org
 END:VEVENT
 BEGIN:VEVENT
 DESCRIPTION:TV/Streaming: Prime Video
@@ -15,14 +23,6 @@ DTEND:20260828T031500Z
 LOCATION:Huntington Bank Field
 DTSTART:20260828T000000Z
 SUMMARY:🏈 New England Patriots at Cleveland Browns
-UID:f29cea12-2e0b-422a-81d1-e56894c9fcbc@f29c.org
-END:VEVENT
-BEGIN:VEVENT
-DESCRIPTION:TV/Streaming: Patriots Preseason Network\, FOX59
-DTEND:20260814T024500Z
-LOCATION:Gillette Stadium
-DTSTART:20260813T233000Z
-SUMMARY:🏈 Indianapolis Colts at New England Patriots
-UID:2f3e6735-ce02-461f-b62b-ff5a268d072b@2f3e.org
+UID:74dd74da-5ac6-4d44-9df3-44583b626cb1@74dd.org
 END:VEVENT
 END:VCALENDAR
